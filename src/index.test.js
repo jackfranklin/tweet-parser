@@ -64,9 +64,10 @@ test('it can parse out a hashtag and a URL', () => {
       content: '#eggs',
       url: 'https://twitter.com/search?q=%23eggs',
     },
+    { type: 'TEXT', content: ' ' },
     {
       type: 'LINK',
-      content: ' http://bbc.co.uk',
+      content: 'http://bbc.co.uk',
       url: 'http://bbc.co.uk',
     },
   ])

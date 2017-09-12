@@ -1,4 +1,5 @@
 // @flow
+
 type TextEntity = {|
   type: 'TEXT',
   content: string,

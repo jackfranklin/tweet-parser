@@ -5,13 +5,22 @@ const REGEX_URL = /(?:\s)(f|ht)tps?:\/\/([^\s\t\r\n<]*[^\s\t\r\n<)*_,.])/g
 const REGEX_USER = /\B@([a-zA-Z0-9_]+)/g
 const REGEX_HASHTAG = /\B#([á-úÁ-Úä-üÄ-Üa-zA-Z0-9_]+)/g
 
-export type Match = {|
+type BaseMatch = {
   fullMatch: string,
   group: string,
   index: number,
-  // TODO: type this based on the constants in the index.js types
-  type: string,
-|}
+}
+
+type HashMatch = BaseMatch & {
+  type: 'HASH',
+}
+type LinkMatch = BaseMatch & {
+  type: 'LINK',
+}
+type UserMatch = BaseMatch & {
+  type: 'USER',
+}
+export type Match = HashMatch | LinkMatch | UserMatch
 
 export const matchHashTags = (tweet: string): Array<Match> => {
   let m
