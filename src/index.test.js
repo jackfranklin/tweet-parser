@@ -51,3 +51,23 @@ test('it can parse out a username and a hashtag', () => {
     },
   ])
 })
+
+test('it can parse out a hashtag and a URL', () => {
+  const tweet = 'Eating breakfast #eggs http://bbc.co.uk'
+
+  const result = tweetParser(tweet)
+
+  expect(result).toEqual([
+    { type: 'TEXT', content: 'Eating breakfast ' },
+    {
+      type: 'HASH',
+      content: '#eggs',
+      url: 'https://twitter.com/search?q=%23eggs',
+    },
+    {
+      type: 'LINK',
+      content: ' http://bbc.co.uk',
+      url: 'http://bbc.co.uk',
+    },
+  ])
+})

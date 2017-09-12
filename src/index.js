@@ -1,7 +1,7 @@
 // @flow
-import { matchUserNames, matchHashTags } from './matchers'
+import { matchUserNames, matchHashTags, matchUrls } from './matchers'
 import type { Match } from './matchers'
-import type { Entity, UserEntity } from './types'
+import type { Entity } from './types'
 
 const createEntityFromMatch = (match: Match): Entity => {
   if (match.type === 'USER') {
@@ -16,13 +16,21 @@ const createEntityFromMatch = (match: Match): Entity => {
       content: match.fullMatch,
       url: `https://twitter.com/search?q=%23${match.group}`,
     }
+  } else if (match.type === 'LINK') {
+    return {
+      type: 'LINK',
+      content: match.fullMatch,
+      url: match.group,
+    }
   }
-
-  return 'foo'
 }
 
 const tweetParser = (tweet: string): Array<Entity> => {
-  const matches = [...matchUserNames(tweet), ...matchHashTags(tweet)]
+  const matches = [
+    ...matchUserNames(tweet),
+    ...matchHashTags(tweet),
+    ...matchUrls(tweet),
+  ]
 
   const matchesByIndex: Map<number, Match> = new Map()
   matches.forEach(match => {
@@ -41,12 +49,14 @@ const tweetParser = (tweet: string): Array<Entity> => {
     if (match !== undefined) {
       finalEntities = [
         ...finalEntities,
-        {
-          content: textEntityInProgress.join(''),
-          type: 'TEXT',
-        },
+        textEntityInProgress.length > 0
+          ? {
+              content: textEntityInProgress.join(''),
+              type: 'TEXT',
+            }
+          : null,
         createEntityFromMatch(match),
-      ]
+      ].filter(Boolean)
 
       textEntityInProgress = []
       let i = index
