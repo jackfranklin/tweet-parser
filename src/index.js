@@ -1,7 +1,6 @@
 // @flow
 import { matchUserNames, matchHashTags, matchUrls } from './matchers'
-import type { Match } from './matchers'
-import type { Entity } from './types'
+import type { Entity, Match } from './types'
 
 const createEntitiesFromMatch = (match: Match): Array<Entity> => {
   switch (match.type) {

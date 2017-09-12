@@ -23,4 +23,21 @@ type UserEntity = {|
   url: string,
 |}
 
+type BaseMatch = {
+  fullMatch: string,
+  group: string,
+  index: number,
+}
+
+type HashMatch = BaseMatch & {
+  type: 'HASH',
+}
+type LinkMatch = BaseMatch & {
+  type: 'LINK',
+}
+type UserMatch = BaseMatch & {
+  type: 'USER',
+}
+export type Match = HashMatch | LinkMatch | UserMatch
+
 export type Entity = TextEntity | LinkEntity | HashEntity | UserEntity
