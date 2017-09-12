@@ -1,12 +1,13 @@
 // @flow
 import tweetParser from './index'
+import type { Entity } from './types'
 
 test('when given a tweet that is just text it returns it', () => {
   const tweet = 'Today for breakfast I am having eggs'
 
   const result = tweetParser(tweet)
 
-  expect(result).toEqual([{ type: 'text', content: tweet }])
+  expect(result).toEqual([{ type: 'TEXT', content: tweet }])
 })
 
 test('it can parse out a username', () => {
@@ -15,17 +16,38 @@ test('it can parse out a username', () => {
   const result = tweetParser(tweet)
 
   expect(result).toEqual([
-    { type: 'text', content: 'Eating breakfast with ' },
+    { type: 'TEXT', content: 'Eating breakfast with ' },
     {
-      type: 'user',
+      type: 'USER',
       content: '@bob',
-      userUrl: 'https://www.twitter.com/bob',
+      url: 'https://www.twitter.com/bob',
     },
-    { type: 'text', content: ' and ' },
+    { type: 'TEXT', content: ' and ' },
     {
-      type: 'user',
+      type: 'USER',
       content: '@jack',
-      userUrl: 'https://www.twitter.com/jack',
+      url: 'https://www.twitter.com/jack',
+    },
+  ])
+})
+
+test('it can parse out a username and a hashtag', () => {
+  const tweet = 'Eating breakfast with @bob #eggs'
+
+  const result = tweetParser(tweet)
+
+  expect(result).toEqual([
+    { type: 'TEXT', content: 'Eating breakfast with ' },
+    {
+      type: 'USER',
+      content: '@bob',
+      url: 'https://www.twitter.com/bob',
+    },
+    { type: 'TEXT', content: ' ' },
+    {
+      type: 'HASH',
+      content: '#eggs',
+      url: 'https://twitter.com/search?q=%23eggs',
     },
   ])
 })

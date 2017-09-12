@@ -1,46 +1,28 @@
 // @flow
-import { matchUserNames } from './matchers'
+import { matchUserNames, matchHashTags } from './matchers'
 import type { Match } from './matchers'
-
-type TextEntity = {|
-  type: 'text',
-  content: string,
-|}
-
-type LinkEntity = {|
-  type: 'link',
-  content: string,
-  url: string,
-|}
-
-type HashEntity = {|
-  type: 'hash',
-  content: string,
-  searchUrl: string,
-|}
-
-type UserEntity = {|
-  type: 'user',
-  content: string,
-  userUrl: string,
-|}
-
-type Entity = TextEntity | LinkEntity | HashEntity | UserEntity
+import type { Entity, UserEntity } from './types'
 
 const createEntityFromMatch = (match: Match): Entity => {
-  if (match.type === 'user') {
+  if (match.type === 'USER') {
     return {
-      type: 'user',
+      type: 'USER',
       content: match.fullMatch,
-      userUrl: `https://www.twitter.com/${match.group}`,
+      url: `https://www.twitter.com/${match.group}`,
+    }
+  } else if (match.type === 'HASH') {
+    return {
+      type: 'HASH',
+      content: match.fullMatch,
+      url: `https://twitter.com/search?q=%23${match.group}`,
     }
   }
+
   return 'foo'
 }
 
 const tweetParser = (tweet: string): Array<Entity> => {
-  const userNames = matchUserNames(tweet)
-  const matches = [...userNames]
+  const matches = [...matchUserNames(tweet), ...matchHashTags(tweet)]
 
   const matchesByIndex: Map<number, Match> = new Map()
   matches.forEach(match => {
@@ -55,20 +37,20 @@ const tweetParser = (tweet: string): Array<Entity> => {
     if (indexesToSkip.indexOf(index) > -1) {
       return
     }
-    if (matchesByIndex.has(index)) {
-      const match = matchesByIndex.get(index)
+    const match = matchesByIndex.get(index)
+    if (match !== undefined) {
       finalEntities = [
         ...finalEntities,
         {
           content: textEntityInProgress.join(''),
-          type: 'text',
+          type: 'TEXT',
         },
         createEntityFromMatch(match),
       ]
 
       textEntityInProgress = []
       let i = index
-      for (i; i < index + match.fullMatch.length; i++) {
+      for (i; i < index + match.fullMatch.length; i += 1) {
         indexesToSkip.push(i)
       }
     } else {
@@ -81,7 +63,7 @@ const tweetParser = (tweet: string): Array<Entity> => {
       ...finalEntities,
       {
         content: textEntityInProgress.join(''),
-        type: 'text',
+        type: 'TEXT',
       },
     ]
   }

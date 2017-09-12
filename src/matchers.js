@@ -3,7 +3,7 @@
 
 const REGEX_URL = /(?:\s)(f|ht)tps?:\/\/([^\s\t\r\n<]*[^\s\t\r\n<)*_,\.])/g
 const REGEX_USER = /\B@([a-zA-Z0-9_]+)/g
-const REGEX_HASHTAG = /\B(#[á-úÁ-Úä-üÄ-Üa-zA-Z0-9_]+)/g
+const REGEX_HASHTAG = /\B#([á-úÁ-Úä-üÄ-Üa-zA-Z0-9_]+)/g
 
 export type Match = {|
   fullMatch: string,
@@ -13,7 +13,24 @@ export type Match = {|
   type: string,
 |}
 
-export const matchHashTags = () => {}
+export const matchHashTags = (tweet: string): Array<Match> => {
+  let m
+  const matches = []
+
+  do {
+    m = REGEX_HASHTAG.exec(tweet)
+    if (m) {
+      matches.push({
+        fullMatch: m[0],
+        group: m[1],
+        index: m.index,
+        type: 'HASH',
+      })
+    }
+  } while (m)
+
+  return matches
+}
 
 export const matchUserNames = (tweet: string): Array<Match> => {
   let m
@@ -26,7 +43,7 @@ export const matchUserNames = (tweet: string): Array<Match> => {
         fullMatch: m[0],
         group: m[1],
         index: m.index,
-        type: 'user',
+        type: 'USER',
       })
     }
   } while (m)
