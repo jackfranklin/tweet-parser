@@ -2,6 +2,8 @@
 
 A JS module for parsing tweets into an array of entities.
 
+Huge thanks go to Vincent Loy and his [TweetParser.js](https://github.com/VincentLoy/tweetParser.js) project, for which the regexes this package uses were originally taken from. Vincent's project is great but works on tweets in the DOM, and I needed something that could take the raw text.
+
 For example, given a [tweet with this content](https://twitter.com/ReactLondon_/status/907536766558720001):
 
 ```
