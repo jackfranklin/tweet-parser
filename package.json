@@ -13,7 +13,7 @@
     "check": "flow check && eslint src && jest",
     "copy-flow": "flow-copy-source src lib",
     "build": "yarn run babel && yarn run copy-flow",
-    "preinstall": "yarn run build"
+    "prepublish": "yarn run build"
   },
   "files": ["lib"],
   "prettier": {
