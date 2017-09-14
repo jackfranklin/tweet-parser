@@ -2,6 +2,7 @@
 import { matchUserNames, matchHashTags, matchUrls } from './matchers'
 import type { Entity, Match } from './types'
 import createEntitiesFromMatch from './create-entities-from-match'
+import mergeTextEntities from './merge-text-entities'
 
 const getMatchesFromIndex = (matches: Array<Match>): Map<number, Match> => {
   const matchesByIndex: Map<number, Match> = new Map()
@@ -88,7 +89,7 @@ const tweetParser = (tweet: string): Array<Entity> => {
     textEntityInProgress: [],
   })
 
-  return result.finalEntities
+  return mergeTextEntities(result.finalEntities)
 }
 
 export default tweetParser

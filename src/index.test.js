@@ -87,3 +87,46 @@ test('it can deal with text at the end', () => {
     { type: 'TEXT', content: ' lol' },
   ])
 })
+
+test('text followed by a space then a link is correctly merged', () => {
+  const tweet = 'watch this http://bbc.com'
+  const result = tweetParser(tweet)
+  expect(result).toEqual([
+    { type: 'TEXT', content: 'watch this ' },
+    { type: 'LINK', content: 'http://bbc.com', url: 'http://bbc.com' },
+  ])
+})
+
+test('a real life complicated tweet', () => {
+  const tweet =
+    'an honest case study on @songkick by @Jack_Franklin. Watch here- http://bit.ly/2gD80W1  #reactlondon'
+
+  const result = tweetParser(tweet)
+
+  expect(result).toEqual([
+    { type: 'TEXT', content: 'an honest case study on ' },
+    {
+      type: 'USER',
+      content: '@songkick',
+      url: 'https://www.twitter.com/songkick',
+    },
+    { type: 'TEXT', content: ' by ' },
+    {
+      type: 'USER',
+      content: '@Jack_Franklin',
+      url: 'https://www.twitter.com/Jack_Franklin',
+    },
+    { type: 'TEXT', content: '. Watch here- ' },
+    {
+      type: 'LINK',
+      content: 'http://bit.ly/2gD80W1',
+      url: 'http://bit.ly/2gD80W1',
+    },
+    { type: 'TEXT', content: '  ' },
+    {
+      type: 'HASH',
+      content: '#reactlondon',
+      url: 'https://twitter.com/search?q=%23reactlondon',
+    },
+  ])
+})

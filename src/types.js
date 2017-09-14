@@ -1,23 +1,23 @@
 // @flow
 
-type TextEntity = {|
+export type TextEntity = {|
   type: 'TEXT',
   content: string,
 |}
 
-type LinkEntity = {|
+export type LinkEntity = {|
   type: 'LINK',
   content: string,
   url: string,
 |}
 
-type HashEntity = {|
+export type HashEntity = {|
   type: 'HASH',
   content: string,
   url: string,
 |}
 
-type UserEntity = {|
+export type UserEntity = {|
   type: 'USER',
   content: string,
   url: string,
