@@ -45,7 +45,7 @@ We get an array of entities:
 
 A side project I was working on had to render tweets from an API and I wanted a nice way of being able to style different parts of the tweet based on if they were a link, hashtag, user reference or just plain text.
 
-## Installation and Usage
+## Installation and Usage
 
 ```
 $ npm install tweet-parser
@@ -58,6 +58,6 @@ import tweetParser from 'tweet-parser'
 
 const result = tweetParser('My fun tweet');
 
-console.log(result())
+console.log(result)
 // [ { type: 'TEXT', content: 'My fun tweet' } ]
 ```
