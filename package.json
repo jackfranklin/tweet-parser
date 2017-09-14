@@ -1,6 +1,6 @@
 {
   "name": "tweet-parser",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Parse out entities from tweets.",
   "main": "lib/index.js",
   "author": "Jack Franklin",
