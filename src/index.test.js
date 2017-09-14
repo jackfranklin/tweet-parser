@@ -1,6 +1,5 @@
 // @flow
 import tweetParser from './index'
-import type { Entity } from './types'
 
 test('when given a tweet that is just text it returns it', () => {
   const tweet = 'Today for breakfast I am having eggs'
@@ -70,5 +69,21 @@ test('it can parse out a hashtag and a URL', () => {
       content: 'http://bbc.co.uk',
       url: 'http://bbc.co.uk',
     },
+  ])
+})
+
+test('it can deal with text at the end', () => {
+  const tweet = 'Eating breakfast with @bob lol'
+
+  const result = tweetParser(tweet)
+
+  expect(result).toEqual([
+    { type: 'TEXT', content: 'Eating breakfast with ' },
+    {
+      type: 'USER',
+      content: '@bob',
+      url: 'https://www.twitter.com/bob',
+    },
+    { type: 'TEXT', content: ' lol' },
   ])
 })

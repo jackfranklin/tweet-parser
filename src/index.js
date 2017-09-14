@@ -1,45 +1,73 @@
 // @flow
 import { matchUserNames, matchHashTags, matchUrls } from './matchers'
 import type { Entity, Match } from './types'
+import createEntitiesFromMatch from './create-entities-from-match'
 
-const createEntitiesFromMatch = (match: Match): Array<Entity> => {
-  switch (match.type) {
-    case 'USER': {
-      return [
-        {
-          type: 'USER',
-          content: match.fullMatch,
-          url: `https://www.twitter.com/${match.group}`,
-        },
-      ]
-    }
-    case 'HASH': {
-      return [
-        {
-          type: 'HASH',
-          content: match.fullMatch,
-          url: `https://twitter.com/search?q=%23${match.group}`,
-        },
-      ]
-    }
-    case 'LINK': {
-      return [
-        // links consume the space before the URL, so they can be matched
-        // but we avoid exposing that by inserting the space as a text entity
-        { type: 'TEXT', content: ' ' },
-        {
-          type: 'LINK',
-          content: match.group,
-          url: match.group,
-        },
-      ]
+const getMatchesFromIndex = (matches: Array<Match>): Map<number, Match> => {
+  const matchesByIndex: Map<number, Match> = new Map()
+  matches.forEach(match => {
+    matchesByIndex.set(match.index, match)
+  })
+  return matchesByIndex
+}
+
+type ProcessTweetState = {|
+  finalEntities: Array<Entity>,
+  textEntityInProgress: Array<string>,
+  matchesByIndex: Map<number, Match>,
+|}
+
+const processTweetCharacter = (
+  tweet: Array<string>,
+  char: number,
+  state: ProcessTweetState
+): ProcessTweetState => {
+  const match = state.matchesByIndex.get(char)
+  if (match !== undefined) {
+    const newFinalEntities = [
+      ...state.finalEntities,
+      state.textEntityInProgress.length > 0
+        ? {
+            content: state.textEntityInProgress.join(''),
+            type: 'TEXT',
+          }
+        : null,
+      ...createEntitiesFromMatch(match),
+    ].filter(Boolean)
+
+    const nextIndexToProcess = char + match.fullMatch.length
+
+    const nextState: ProcessTweetState = {
+      matchesByIndex: state.matchesByIndex,
+      finalEntities: newFinalEntities,
+      textEntityInProgress: [],
     }
 
-    default: {
-      ;(match: empty) // eslint-disable-line no-unused-expressions
-      // this will never get hit as all cases are satisifed, but Flow
-      // does not seem to agree :(
-      throw new Error(`Got an invalid match!`)
+    if (nextIndexToProcess === tweet.length) {
+      return nextState
+    } else {
+      return processTweetCharacter(tweet, nextIndexToProcess, nextState)
+    }
+  } else {
+    const newTextEntityInProgress = [...state.textEntityInProgress, tweet[char]]
+    if (tweet.length - 1 === char) {
+      return {
+        state,
+        finalEntities: [
+          ...state.finalEntities,
+          {
+            type: 'TEXT',
+            content: newTextEntityInProgress.join(''),
+          },
+        ],
+        textEntityInProgress: [],
+      }
+    } else {
+      const newState = {
+        ...state,
+        textEntityInProgress: newTextEntityInProgress,
+      }
+      return processTweetCharacter(tweet, char + 1, newState)
     }
   }
 }
@@ -51,53 +79,15 @@ const tweetParser = (tweet: string): Array<Entity> => {
     ...matchUrls(tweet),
   ]
 
-  const matchesByIndex: Map<number, Match> = new Map()
-  matches.forEach(match => {
-    matchesByIndex.set(match.index, match)
+  const matchesByIndex = getMatchesFromIndex(matches)
+
+  const result = processTweetCharacter(tweet.split(''), 0, {
+    matchesByIndex,
+    finalEntities: [],
+    textEntityInProgress: [],
   })
 
-  let finalEntities: Array<Entity> = []
-
-  let textEntityInProgress = []
-  const indexesToSkip = []
-  tweet.split('').forEach((char, index) => {
-    if (indexesToSkip.indexOf(index) > -1) {
-      return
-    }
-    const match = matchesByIndex.get(index)
-    if (match !== undefined) {
-      finalEntities = [
-        ...finalEntities,
-        textEntityInProgress.length > 0
-          ? {
-              content: textEntityInProgress.join(''),
-              type: 'TEXT',
-            }
-          : null,
-        ...createEntitiesFromMatch(match),
-      ].filter(Boolean)
-
-      textEntityInProgress = []
-      let i = index
-      for (i; i < index + match.fullMatch.length; i += 1) {
-        indexesToSkip.push(i)
-      }
-    } else {
-      textEntityInProgress.push(char)
-    }
-  })
-
-  if (textEntityInProgress.length > 0) {
-    finalEntities = [
-      ...finalEntities,
-      {
-        content: textEntityInProgress.join(''),
-        type: 'TEXT',
-      },
-    ]
-  }
-
-  return finalEntities
+  return result.finalEntities
 }
 
 export default tweetParser

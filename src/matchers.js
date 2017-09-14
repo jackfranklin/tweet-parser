@@ -1,7 +1,8 @@
 // @flow
 import type { Match } from './types'
 
-// regexes taken and adapted from https://github.com/VincentLoy/tweetParser.js/blob/master/dev/tweetParser.js
+// regexes taken and adapted from
+// https://github.com/VincentLoy/tweetParser.js/blob/master/dev/tweetParser.js
 const REGEX_URL = /(?:\s)(f|ht)tps?:\/\/([^\s\t\r\n<]*[^\s\t\r\n<)*_,.])/g
 const REGEX_USER = /\B@([a-zA-Z0-9_]+)/g
 const REGEX_HASHTAG = /\B#([á-úÁ-Úä-üÄ-Üa-zA-Z0-9_]+)/g
