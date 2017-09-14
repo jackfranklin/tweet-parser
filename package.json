@@ -7,13 +7,13 @@
   "license": "MIT",
   "dependencies": {},
   "scripts": {
-    "test": "jest",
     "test:watch": "yarn run test -- --watch",
     "babel": "babel src/ -d lib --ignore '**/*.test.js'",
     "check": "flow check && eslint src && jest",
     "copy-flow": "flow-copy-source src lib",
     "build": "yarn run babel && yarn run copy-flow",
-    "prepublish": "yarn run build"
+    "prepublish": "yarn run build",
+    "test": "flow check && eslint src && jest --runInBand"
   },
   "files": ["lib"],
   "prettier": {
