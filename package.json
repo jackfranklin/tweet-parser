@@ -12,7 +12,7 @@
     "check": "flow check && eslint src && jest",
     "copy-flow": "flow-copy-source src lib",
     "build": "yarn run babel && yarn run copy-flow",
-    "prepublish": "yarn run build",
+    "prepublishOnly": "yarn run build",
     "test": "flow check && eslint src && jest --runInBand"
   },
   "files": ["lib"],
