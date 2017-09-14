@@ -16,6 +16,7 @@ module.exports = {
       },
     ],
     semi: ['error', 'never'],
+    'no-else-return': 'off',
     'react/sort-comp': 'off',
   },
   plugins: ['prettier'],
